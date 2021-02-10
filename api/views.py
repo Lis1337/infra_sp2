@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters, exceptions, permissions, status, generics, mixins
-from rest_framework.response import Response  
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.mail import send_mail
@@ -7,10 +7,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import User, Genre, Category, Title, Review, Comment
-from api.serializers import (UserSerializer, TokenSerializer, SignUpSerializer, GenreSerializer, 
-CategorySerializer, TitleSerializer, CommentSerializer, ReviewSerializer
-)
-from api.permissions import IsAdmin, IsAdminOrReadOnly, IsStaffOrOwnerOrReadOnly 
+from api.serializers import (UserSerializer, TokenSerializer, SignUpSerializer, GenreSerializer,
+CategorySerializer, TitleSerializer, CommentSerializer, ReviewSerializer)
+from api.permissions import IsAdmin, IsAdminOrReadOnly, IsStaffOrOwnerOrReadOnly
 from api.filters import TitleFilter
 import uuid
 
@@ -26,14 +25,14 @@ class MeProfileView(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
         return self.request.user
 
 
 class EmailSignUpView(APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
@@ -49,7 +48,7 @@ class EmailSignUpView(APIView):
                 [email],
                 fail_silently=True,
             )
-            return Response({'result':'Код подтверждения отправлен на вашу почту {}'.format(code)}, status=200)
+            return Response({'result': 'Код подтверждения отправлен на вашу почту {}'.format(code)}, status=200)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -58,7 +57,7 @@ class CodeConfirmView(APIView):
 
     def post(self, *args, **kwargs):
         serializer = TokenSerializer(data=self.request.data)
-        serializer.is_valid(raise_exception=True)  
+        serializer.is_valid(raise_exception=True)
         try:
             user = User.objects.get(
                 email=serializer.data['email'], code=serializer.data['code']
@@ -78,13 +77,13 @@ class CodeConfirmView(APIView):
 
 
 class GenreListCreteDestroyView(mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
-                   viewsets.GenericViewSet):
+                                mixins.DestroyModelMixin,
+                                mixins.ListModelMixin,
+                                viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, 
+        permissions.IsAuthenticatedOrReadOnly,
         IsAdminOrReadOnly
     ]
     lookup_field = 'slug'
@@ -93,13 +92,13 @@ class GenreListCreteDestroyView(mixins.CreateModelMixin,
 
 
 class CategoryListCreteDestroyView(mixins.CreateModelMixin,
-                   mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
-                   viewsets.GenericViewSet):
+                                   mixins.DestroyModelMixin,
+                                   mixins.ListModelMixin,
+                                   viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [
-        permissions.IsAuthenticatedOrReadOnly, 
+        permissions.IsAuthenticatedOrReadOnly,
         IsAdminOrReadOnly
     ]
     lookup_field = 'slug'
@@ -110,7 +109,7 @@ class CategoryListCreteDestroyView(mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    
+
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -118,21 +117,21 @@ class TitleViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(
             genre=Genre.objects.filter(slug__in=self.request.data.getlist('genre')),
-            category=Category.objects.get( slug=self.request.data.get('category'))
+            category=Category.objects.get(slug=self.request.data.get('category'))
         )
 
     def perform_update(self, serializer):
         serializer.save(
             genre=Genre.objects.filter(slug__in=self.request.data.getlist('genre')),
             category=get_object_or_404(Category, slug=self.request.data.get('category'))
-            )
+        )
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsStaffOrOwnerOrReadOnly]
-    
+
     def get_queryset(self):
         queryset = self.queryset
         return queryset.filter(title_id=self.kwargs['title_id'])

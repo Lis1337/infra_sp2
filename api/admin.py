@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'category', 'name', 'year','description')
+    list_display = ('id', 'category', 'name', 'year', 'description')
     empty_value_display = '-пусто-'
 
 

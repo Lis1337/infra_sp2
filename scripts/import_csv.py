@@ -60,7 +60,7 @@ with open('comments.csv') as com:
     for row in reader:
         if row[0] != 'id':
             Comment.objects.get_or_create(
-                review_id = row[1],
+                review_id=row[1],
                 text=row[2],
                 author=row[3],
                 pub_date=row[4],

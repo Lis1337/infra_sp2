@@ -6,9 +6,9 @@ from api.models import User, Genre, Category, Title, Comment, Review
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('username', 'id', 'first_name', 'last_name', 'email','role', 'bio')
+        fields = ('username', 'id', 'first_name', 'last_name', 'email', 'role', 'bio')
         model = User
-    
+
 
 class TokenSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
@@ -16,7 +16,7 @@ class TokenSerializer(serializers.Serializer):
 
 
 class SignUpSerializer(serializers.ModelSerializer):
-    
+
     class Meta:
         model = User
         fields = ('email',)
@@ -39,7 +39,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
-    
+
     class Meta:
         model = Title
         fields = '__all__'
@@ -47,7 +47,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
-    
+
     class Meta:
         model = Comment
         fields = ('id', 'text', 'author', 'pub_date')
@@ -57,7 +57,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
     title_id = serializers.ReadOnlyField(source='title.pk')
     score = serializers.IntegerField(min_value=1, max_value=10)
-    
+
     class Meta:
         model = Review
         fields = '__all__'
