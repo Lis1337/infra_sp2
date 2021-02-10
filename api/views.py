@@ -7,8 +7,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from api.models import User, Genre, Category, Title, Review, Comment
-from api.serializers import (UserSerializer, TokenSerializer, SignUpSerializer, GenreSerializer,
-CategorySerializer, TitleSerializer, CommentSerializer, ReviewSerializer)
+from api.serializers import (UserSerializer, TokenSerializer,
+                             SignUpSerializer, GenreSerializer,
+                             CategorySerializer, TitleSerializer,
+                             CommentSerializer, ReviewSerializer)
 from api.permissions import IsAdmin, IsAdminOrReadOnly, IsStaffOrOwnerOrReadOnly
 from api.filters import TitleFilter
 import uuid
